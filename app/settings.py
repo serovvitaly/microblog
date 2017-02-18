@@ -33,7 +33,6 @@ ALLOWED_HOSTS = env.ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     'rest_framework',
-    'spider',
     'ckeditor',
     'django_comments',
     'ckeditor_uploader',
