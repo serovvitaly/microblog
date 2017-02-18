@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import env
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,15 +21,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k=5$n3jg-&+d4h+f_c9h_fmq(r5wze829q&lsu-u626917l(*6'
+SECRET_KEY = env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.DEBUG
 
-ALLOWED_HOSTS = [
-    '194.67.201.141',
-    'devgang.ru',
-]
+ALLOWED_HOSTS = env.ALLOWED_HOSTS
 
 
 # Application definition
@@ -61,7 +59,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'app.urls'
 
-TEMPLATES_DIR = 'templates/mobile' #'templates/material'
+TEMPLATES_DIR = 'templates'
 
 TEMPLATES = [
     {
@@ -90,11 +88,11 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'microblog',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
-        'CHARSET': 'utf-8',
+        'NAME': env.psql['NAME'],
+        'USER': env.psql['USER'],
+        'PASSWORD': env.psql['PASSWORD'],
+        'HOST': env.psql['HOST'],
+        'CHARSET': env.psql['CHARSET'],
     }
 }
 
