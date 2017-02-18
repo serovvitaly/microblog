@@ -4,6 +4,7 @@ from django.http import Http404, HttpResponseForbidden, HttpResponse, JsonRespon
 import markdown
 from django.template import loader, Context
 import re
+import env
 
 
 class IndexView(generic.TemplateView):
@@ -23,6 +24,7 @@ class IndexView(generic.TemplateView):
         else:
             posts = Post.objects.filter(is_active__exact=True).all()
         return {
+            'debug_mode': env.DEBUG,
             'items': posts,
             'wrapper_widget': 'widget/multi-column.html',
             'item_widget': 'widget/post-mini.html',
@@ -85,6 +87,7 @@ class PostView(generic.TemplateView):
         post_content = self.post.content
         post_content = self.snippet_post_1(post_content)
         return {
+            'debug_mode': env.DEBUG,
             'RESULT_PAGE': '/hello/',
             'item': self.post,
             'post_content': markdown.markdown(post_content),
