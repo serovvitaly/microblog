@@ -1,7 +1,0 @@
-{% with base_post=item %}
-    {% for post in posts %}
-        {% with item=post %}
-            {% include 'widget/post-mini.html' %}
-        {% endwith %}
-    {% endfor %}
-{% endwith %}
