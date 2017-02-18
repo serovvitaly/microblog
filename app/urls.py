@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^group/(?P<group_id>\d+)', views.GroupView.as_view()),
     url(r'^series/(?P<series_id>\d+)', views.SeriesView.as_view()),
     url(r'^series', views.SeriesListView.as_view()),
-    url(r'^admin/', admin.site.urls),
+    #url(r'^admin/', admin.site.urls),
     url(r'^editor/', views.EditorView.as_view()),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^comments/', include('django_comments.urls')),
