@@ -163,7 +163,14 @@ class Ribbon(models.Model):
     Лента
     """
     title = models.CharField(max_length=300)
+    #logo_url = models.CharField(max_length=300)
     meta_data = JSONField(blank=True, null=True)
+
+    def logo_url(self):
+        try:
+            return self.meta_data['logo_url']
+        except:
+            pass
 
     def __str__(self):
         return self.title
