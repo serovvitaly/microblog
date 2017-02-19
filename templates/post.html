@@ -23,7 +23,11 @@
 <div class="post-content">{{ post_content|safe }}</div>
 {% if item.source_base_url %}
     <hr>
-<p class="small"><strong>Источник:</strong> {{ item.source_base_url }}</p>
+<p>
+    <a href="{{ item.source_url }}" class="btn btn-sm btn-default" target="_blank">
+        <strong>Источник:</strong> {{ item.source_base_url }}
+    </a>
+</p>
 {% endif %}
 {% include 'widget/related-posts.html' %}
 {% include 'widget/interesting-posts.html' %}

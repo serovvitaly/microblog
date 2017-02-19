@@ -6,26 +6,21 @@ from django.template import loader, Context
 import re
 import env
 
+def is_debug_mode():
+    return env.DEBUG
 
 class IndexView(generic.TemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):
-        series_id = None
-        try:
-            if 'series' in self.request.GET:
-                series_id = int(self.request.GET['series'])
-        except ValueError:
-            pass
         is_editor = self.request.user.has_perm('blog.change_post')
-        if series_id:
-            series = Series.objects.get(pk=series_id)
-            posts = series.posts(only_is_active=True)
+        if is_debug_mode():
+            posts = Post.objects.filter(status__in=['p', 'd'])
         else:
-            posts = Post.objects.filter(is_active__exact=True).all()
+            posts = Post.objects.filter(status__exact='p')
         return {
-            'debug_mode': env.DEBUG,
-            'items': posts,
+            'debug_mode': is_debug_mode(),
+            'items': posts.all(),
             'wrapper_widget': 'widget/multi-column.html',
             'item_widget': 'widget/post-mini.html',
             'is_editor': is_editor,
@@ -82,12 +77,15 @@ class PostView(generic.TemplateView):
             self.post = Post.objects.get(pk=kwargs['post_id'])
         except Post.DoesNotExist:
             raise Http404("Post not found")
-        if self.request.user.has_perm('blog.change_post', self.post) is False and self.post.is_active is False:
+        allowed_statuses = ['p']
+        if is_debug_mode():
+            allowed_statuses.append('d')
+        if self.request.user.has_perm('blog.change_post', self.post) is False and self.post.status not in allowed_statuses:
             raise Http404("Post not found")
         post_content = self.post.content
         post_content = self.snippet_post_1(post_content)
         return {
-            'debug_mode': env.DEBUG,
+            'debug_mode': is_debug_mode(),
             'RESULT_PAGE': '/hello/',
             'item': self.post,
             'post_content': markdown.markdown(post_content),
