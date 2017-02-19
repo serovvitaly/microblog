@@ -3,11 +3,13 @@
         <div class="media-body">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    {% if item.ribbon.logo_url %}
                     <img
                         alt="64x64"
                         src="{{ item.ribbon.logo_url }}"
                         style="width: 32px; height: 32px; margin: -5px; display: inline-block;"
                     >
+                    {% endif %}
                     <strong style="padding-left: 5px;">{{ item.ribbon.title }}</strong>
                 </div>
                 <div class="panel-body">
