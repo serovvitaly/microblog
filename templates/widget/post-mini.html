@@ -1,28 +1,33 @@
 <div id="post-item-{{ item.id }}" class="col-lg-12 post-mini {% if item.is_active %}toggle-0{% else %}toggle-1{% endif %}">
-    <div class="media">
-        <div class="media-body">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    {% if item.ribbon.logo_url %}
-                    <img
-                        alt="64x64"
-                        src="{{ item.ribbon.logo_url }}"
-                        style="width: 32px; height: 32px; margin: -5px; display: inline-block;"
-                    >
-                    {% endif %}
-                    <strong style="padding-left: 5px;">{{ item.ribbon.title }}</strong>
-                </div>
-                <div class="panel-body">
-                    <h3 class="media-heading title"><a href="{{ item.url }}?from=list_title">{{ item.title }}</a></h3>
-                    {% if item.image %}
-                    <img alt="{{ item.title }}" src="{{ item.image }}" style="max-width: 400px; margin-bottom: 10px;">
-                    {% endif %}
-                    <div class="small">{{ item.annotation|safe }}</div>
-                </div>
+    <div class="media-body">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {% if item.ribbon.logo_url %}
+                <img
+                    class="ribbon-icon"
+                    alt="64x64"
+                    src="{{ item.ribbon.logo_url }}"
+                >
+                {% endif %}
+                <strong style="padding-left: 5px;">{{ item.ribbon.title }}</strong>
+            </div>
+            <div class="panel-body">
+                <h3 class="media-heading title">{{ item.title }}</h3>
+                {% if item.image %}
+                <img alt="{{ item.title }}" src="{{ item.image }}" style="margin-bottom: 10px;">
+                {% endif %}
+                <div class="small">{{ item.annotation|safe }}</div>
+                <a
+                    class="btn btn-primary btn-sm btn-block"
+                    href="{{ item.url }}?from=index"
+                    onclick="return showModal('{{ item.id }}');"
+                >
+                    <strong>Показать полностью</strong>
+                </a>
+            </div>
+            <div class="panel-footer">
                 {% if is_editor %}
-                <div class="panel-footer">
-                    {% include 'widget/editor-control.html' %}
-                </div>
+                {% include 'widget/editor-control.html' %}
                 {% endif %}
             </div>
         </div>
