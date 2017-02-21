@@ -20,7 +20,7 @@
         color: #3e3e3e;
         font-size: 15px;
         font-weight: 400;
-        background: #f0f1f3;
+        background: #f0f1f3 /*fixed url("/img/background-1.png")*/;
     }
     .title{
         font-family: 'PT Sans Narrow', sans-serif;
@@ -45,7 +45,6 @@
 
     }
     .content-center{
-        background: white;
         margin-top: 5px;
         margin-bottom: 5px;
         border-radius: 3px;
@@ -88,15 +87,21 @@
         margin-right: 5px;
     }
     .panel-default {
-        border: 1px dashed #dddddd;
+
     }
     .media img.media-object{
         border: 1px solid #ebebeb;
         border-radius: 47px;
         padding: 2px;
     }
+    .panel-default > .panel-heading {
+        background-color: #fbfbfb;
+        border-color: #e5e5e5;
+    }
     .panel-footer {
         padding: 5px 10px;
+        background-color: #fbfbfb;
+        border-color: #efefef;
     }
     .post-mini img{
         max-width: 100%;
@@ -206,6 +211,13 @@
         -webkit-box-sizing: content-box;
            -moz-box-sizing: content-box;
                 box-sizing: content-box;
+    }
+    .ribbon-icon{
+        width: 32px;
+        height: 32px;
+        margin: -5px;
+        display: inline-block;
+        border-radius: 50%;
     }
 </style>
 </head>

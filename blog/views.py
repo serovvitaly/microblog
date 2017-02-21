@@ -15,12 +15,21 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         is_editor = self.request.user.has_perm('blog.change_post')
         if is_debug_mode():
-            posts = Post.objects.filter(status__in=['p', 'd'])
+            posts = Post.objects.filter(status__in=['p', 'd']).all()
         else:
-            posts = Post.objects.filter(status__exact='p')
+            posts = Post.objects.filter(status__exact='p').all()
+
+        items_by_columns = {1: [], 2: [], 3: []}
+        column_index = 1
+        for post in posts:
+            items_by_columns[column_index].append(post)
+            if column_index > 2:
+                column_index = 0
+            column_index += 1
+
         return {
             'debug_mode': is_debug_mode(),
-            'items': posts.all(),
+            'items_by_columns': items_by_columns,
             'wrapper_widget': 'widget/multi-column.html',
             'item_widget': 'widget/post-mini.html',
             'is_editor': is_editor,
@@ -84,15 +93,26 @@ class PostView(generic.TemplateView):
             raise Http404("Post not found")
         post_content = self.post.content
         post_content = self.snippet_post_1(post_content)
-        return {
-            'debug_mode': is_debug_mode(),
-            'RESULT_PAGE': '/hello/',
-            'item': self.post,
-            'post_content': markdown.markdown(post_content),
-            'posts': Post.objects.filter(is_active__exact=True),
-            'is_editor': self.request.user.has_perm('blog.change_post'),
-            'sub_posts': Post.objects.all()[0:6],
-        }
+        if self.request.is_ajax():
+            return {
+                'layout': 'layout-post-ajax.html',
+                'debug_mode': is_debug_mode(),
+                'item': self.post,
+                'post_content': markdown.markdown(post_content),
+                'posts': Post.objects.filter(is_active__exact=True),
+                'is_editor': self.request.user.has_perm('blog.change_post'),
+                'sub_posts': Post.objects.all()[0:6],
+            }
+        else:
+            return {
+                'layout': 'layout-9-3.html',
+                'debug_mode': is_debug_mode(),
+                'item': self.post,
+                'post_content': markdown.markdown(post_content),
+                'posts': Post.objects.filter(is_active__exact=True),
+                'is_editor': self.request.user.has_perm('blog.change_post'),
+                'sub_posts': Post.objects.all()[0:6],
+            }
 
 
 class PostsView(generic.View):
