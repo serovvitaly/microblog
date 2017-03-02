@@ -21,17 +21,22 @@
 <script>
 var currentPageNumber = 1;
 function loadPosts() {
+    var ch = [];
+    ch.push(document.getElementById('mc-column-1').clientHeight);
+    ch.push(document.getElementById('mc-column-2').clientHeight);
+    ch.push(document.getElementById('mc-column-3').clientHeight);
     $.ajax({
         'url': '/page/' + currentPageNumber + '/',
         'type': 'get',
         'dataType': 'json',
+        'data': {
+            'ch': ch.join(',')
+        },
         'success': function(response){
-            console.log()
             if(response.items.length < 1){
                 return null;
             }
             $.each(response.items, function (columnNumber, columnHtml) {
-                console.log(columnNumber, columnHtml)
                 $('#mc-column-'+columnNumber).append(columnHtml);
             });
             currentPageNumber += 1;

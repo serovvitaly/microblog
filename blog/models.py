@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 from django.utils.html import strip_tags
 import markdown
+import re
 
 
 STATUS_CHOICES = (
@@ -68,11 +69,41 @@ class Post(models.Model):
 
     def annotation(self):
         content_sections = self.content.split('<!--ANNOTATION_SPLITTER-->')
-        if len(content_sections) == 1:
-            return ''
-        annotation = content_sections[0]
-        #annotation = markdown.markdown(annotation)
-        return annotation.strip()
+        if len(content_sections) > 1:
+            annotation = content_sections[0]
+            return annotation.strip()
+        from html.parser import HTMLParser
+        class MLStripper(HTMLParser):
+            def __init__(self):
+                self.reset()
+                self.strict = False
+                self.convert_charrefs = True
+                self.img_counter = 0
+                self.fed = []
+
+            def handle_starttag(self, tag, attrs):
+                attrs = {key: value for key, value in attrs}
+                if tag == 'img':
+                    if self.img_counter >= 1:
+                        return
+                    if 'class' in attrs:
+                        if attrs['class'] == 'webfeedsFeaturedVisual':
+                            return
+                    self.fed.append('<img src="'+attrs['src']+'" alt="">')
+                    self.img_counter += 1
+
+            def handle_data(self, d):
+                self.fed.append(d)
+
+            def get_data(self):
+                content = '\n'.join(self.fed)
+                content = ' '.join(content.split(' ')[0:100])
+                #content = re.sub(r'(\n{2,})', '<br>', content)
+                return content
+
+        s = MLStripper()
+        s.feed(content_sections[0])
+        return s.get_data()
 
     def len_without_sp(self):
         return len(self.content.replace(' ', ''))
