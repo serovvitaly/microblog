@@ -1,7 +1,7 @@
 <div class="row">
-    {% for column_items in items_by_columns.values %}
+    {% for column_number, column_items in items_by_columns.items %}
     <div class="col-lg-4">
-        <div class="row">
+        <div class="row" id="mc-column-{{ column_number }}">
         {% for item in column_items %}
             {% include item_widget %}
         {% endfor %}

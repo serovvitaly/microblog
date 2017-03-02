@@ -30,4 +30,13 @@ urlpatterns = [
     url(r'^comments/', include('django_comments.urls')),
     url(r'^metrics/', views.MetricsView.as_view()),
     url(r'^render/', views.RenderView.as_view()),
+    url(r'^page/(?P<page_number>\d+)', views.IndexView.get_page),
 ]
+
+from django.conf import settings
+from django.conf.urls import include, url
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]

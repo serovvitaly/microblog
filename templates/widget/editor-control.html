@@ -1,6 +1,6 @@
 <div>
     <div class="btn-group btn-group-xs" role="group" aria-label="...">
-        <a class="btn btn-link" target="_blank" href="http://admin.blog.devgang.ru/admin/blog/post/{{ item.id }}/change/">редактировать</a>
+        <a class="btn btn-link" target="_blank" href="http://admin.zalipay.com/admin/blog/post/{{ item.id }}/change/">редактировать</a>
         <a class="btn btn-link" target="_blank" href="{{ item.source_url }}">источник</a>
         {% if is_fast_editor %}
         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#post-editor-modal-{{ item.id }}">
@@ -60,12 +60,12 @@
   </div>
 </div>
 {% if is_fast_editor %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+{% comment %}<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>{% endcomment %}
 <script>
-var simplemde = new SimpleMDE({
+{% comment %}var simplemde = new SimpleMDE({
     element: document.getElementById("post-editor")
-});
+});{% endcomment %}
 function savePost(postId) {
     $.ajax({
         'url': '/post/'+postId+'/save',

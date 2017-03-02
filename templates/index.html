@@ -7,6 +7,44 @@
     <div class="col-lg-12">
         {% include wrapper_widget %}
     </div>
+    <div class="col-lg-12">
+        <div class="row">
+            <dev class="col-lg-4"></dev>
+            <dev class="col-lg-4">
+                <button onclick="loadPosts();" class="btn btn-default btn-block">Загрузить ещё</button>
+            </dev>
+            <dev class="col-lg-4"></dev>
+        </div>
+    </div>
 </div>
 {% include 'widget/post-modal.html' %}
+<script>
+var currentPageNumber = 1;
+function loadPosts() {
+    var ch = [];
+    ch.push(document.getElementById('mc-column-1').clientHeight);
+    ch.push(document.getElementById('mc-column-2').clientHeight);
+    ch.push(document.getElementById('mc-column-3').clientHeight);
+    $.ajax({
+        'url': '/page/' + currentPageNumber + '/',
+        'type': 'get',
+        'dataType': 'json',
+        'data': {
+            'ch': ch.join(',')
+        },
+        'success': function(response){
+            if(response.items.length < 1){
+                return null;
+            }
+            $.each(response.items, function (columnNumber, columnHtml) {
+                $('#mc-column-'+columnNumber).append(columnHtml);
+            });
+            currentPageNumber += 1;
+        }
+    })
+}
+$(function () {
+    loadPosts();
+});
+</script>
 {% endblock %}

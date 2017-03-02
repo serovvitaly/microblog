@@ -1,18 +1,79 @@
 from django.core.management.base import BaseCommand
 import urllib.request
 import urllib.parse
+import urllib.error
 import json
 import re
+import datetime
+from blog.models import Post, Ribbon
+from progress.bar import Bar
 from lxml import etree
-from datetime import datetime
 import psycopg2
-import csv
-import time
-
+from pymongo import MongoClient
 import locale
 locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
-#conn = psycopg2.connect("dbname='microblog' user='postgres' host='localhost' password='123'")
+class AdmeParser:
+
+    def __init__(self, url):
+        self.url = url
+        self.html = self.exec()
+
+    def exec(self):
+        request = urllib.request.Request(
+            self.url,
+            data=None,
+            headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'}
+        )
+        try:
+            with urllib.request.urlopen(request) as f:
+                content = f.read().decode('utf-8')
+                content = re.sub(r'<script>[\s\S]*?</script>', '', content)
+                return content
+        except urllib.error.HTTPError as error:
+            print(error)
+            return None
+
+    def get_html(self):
+        return self.html
+
+
+class AdmePostParser(AdmeParser):
+
+    def get_title(self):
+        title_gr = re.search('<h1>(.+)</h1>', self.html)
+        if len(title_gr.groups()) < 1:
+            return None
+        return str(title_gr.groups()[0]).strip()
+
+    def get_views_count(self):
+        matches = re.search('<li class="al-stats-views"><a href="#">([\d]*)</a></li>', self.html)
+        if len(matches.groups()) < 1:
+            return None
+        return int(str(matches.groups()[0]).strip())
+
+    def get_posted_at(self):
+        months = {'января':'1','февраля':'2','марта':'3','апреля':'4','мая':'5','июня':'6',
+                  'июля':'7','августа':'8','сентября':'9','октября':'10','ноября':'11','декабря':'12',}
+        matches = re.search('<li class="al-stats-date" style="display: block;">(\d+) (\w+) (\d+)</li>', self.html)
+        month = int(months[matches.groups()[1]])
+        return datetime.datetime(day=int(matches.groups()[0]), month=month, year=int(matches.groups()[2]))
+
+    def get_content(self):
+        article_content = re.search('<article[^>]*>([\s\S]+?)</article>', self.html)
+        if article_content is None:
+            return None
+        return str(article_content.groups()[0]).strip()
+
+
+class AdmePageParser(AdmeParser):
+
+    def get_urls(self):
+        list = re.findall(r'<a href="([^"]+)"><img class="al-pic" src="([^"]*)" width="[\d]+" height="[\d]+" alt="[^"]*"></a>', self.html)
+        return list
+
+
+
 conn = psycopg2.connect(database="microblog", user="postgres", password="123", host="localhost")
 cur = conn.cursor()
 
@@ -92,18 +153,80 @@ class Command(BaseCommand):
             )
             conn.commit()
 
+    def parse_adme_pages(self):
+        client = MongoClient()
+        db = client.adme
+        upst = db.posts_urls
+
+        for page in range(1, 86):
+            purl = 'https://www.adme.ru/svoboda-psihologiya/page' + str(page) + '/'
+            parser = AdmePageParser(purl)
+            posts_urls = parser.get_urls()
+            for post_url in posts_urls:
+                upst.insert_one({
+                    'url': 'https://www.adme.ru' + post_url[0],
+                    'img': post_url[1],
+                })
+
+    def parse_adme_posts(self):
+        client = MongoClient()
+        db = client.adme
+        upst = db.posts_urls
+        pst = db.posts
+        posts_urls = upst.find()
+        bar = Bar('Processing', max=posts_urls.count())
+        for post_url in posts_urls:
+            try:
+                parser = AdmePostParser(post_url['url'])
+                pst.insert_one({
+                    'title': parser.get_title(),
+                    'views_count': parser.get_views_count(),
+                    'content': parser.get_content(),
+                    'posted_at': parser.get_posted_at(),
+                    'revision_at': datetime.datetime.now(),
+                    'source_url': post_url['url'],
+                })
+            except:
+                continue
+            bar.next()
+        bar.finish()
+
+    def prepare_adme_posts_1(self):
+        client = MongoClient()
+        db = client.adme
+        posts = db.posts.find()
+        for post in posts:
+            content = post['content']
+            content = re.sub(r'(<h1>[^<]*<\/h1>)', '', content)
+            content = re.sub(r'(<p>[\s]*?</p>)', '', content)
+            content = re.sub(r'(<p style="text-align: right;">[\s\S]*?</p>)', '', content)
+            content = re.sub(r'(<div id="js-article-share-top"[\s\S]+?<\/div>[\s]+<\/div>[\s]+<\/div>[\s]<\/div>)', '', content)
+            content = re.sub(r'(<div id="js-block-[\d]+">[\s]+<p>[\s]+<strong>Смотрите также<\/strong>[\s\S]+?<\/p>[\s]+<\/div>)', '', content)
+            content = re.sub(r'(<div id="js-block-">[\s\S]+?<\/div><\/div>[\s]+<\/div>)', '', content)
+            content = re.sub(r'(<p>[\s]+<a name="image[\d]+" href="#image[\d]+" style="[^"]+"[\s]+class="[^"]+">[\s]+<span class="article-pic js-article-image "[\s]+data-id="[\d]+">[\s]+<img src="([^"]+?)" data-social="[^"]+?"[^\/]+\/>[\s]+<\/span>[\s]+<\/a>[\s]+<\/p>)', r'<div class="post-inner-image"><img src="\2" alt=""></div>', content)
+            content = content.strip()
+            post['content2'] = content
+            db.posts.update_one(
+                {'_id': post['_id']},
+                {'$set': post}
+            )
+
+    def prepare_adme_posts_2(self):
+        client = MongoClient()
+        db = client.adme
+        posts = db.posts.find()
+        ribbon = Ribbon.objects.get(pk=11)
+        for post in posts:
+            Post(
+                title=post['title'],
+                content=post['content2'],
+                status='d',
+                ribbon=ribbon,
+                meta_data={
+                    'source_url': post['source_url'],
+                }
+            ).save()
+
     def handle(self, *args, **options):
-
-        parts = {}
-
-        for url in range(1, 10):
-            url_parts = url.split('/')
-            print(url_parts[3])
-            if url_parts[3] not in parts:
-                parts['sd'] = 1
-            pass
-
-        for page in range(1, 10):
-            #time.sleep(1)
-            print('Page', page)
-            self.parse_page_to_csv(page, 10)
+        self.prepare_adme_posts_2()
+        pass

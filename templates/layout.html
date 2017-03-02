@@ -20,13 +20,16 @@
         color: #3e3e3e;
         font-size: 15px;
         font-weight: 400;
-        background: #f0f1f3 /*fixed url("/img/background-1.png")*/;
+        background: #e6e6e8 /*fixed url("/img/background-1.png")*/;
     }
     .title{
         font-family: 'PT Sans Narrow', sans-serif;
         /*font-family: 'Open Sans Condensed', sans-serif;*/
         font-weight: bold;
         color: #556270;
+        font-size: 20px;
+        line-height: 20px;
+        margin-bottom: 12px;
     }
     .title a{
         color: #556270;
@@ -105,6 +108,11 @@
     }
     .post-mini img{
         max-width: 100%;
+    }
+    .post-mini .panel-content{
+        max-height: 300px;
+        overflow: hidden;
+        margin-bottom: 5px;
     }
 
     header {
@@ -215,7 +223,7 @@
     .ribbon-icon{
         width: 32px;
         height: 32px;
-        margin: -5px;
+        margin: -7px -5px -5px;
         display: inline-block;
         border-radius: 50%;
     }
@@ -241,7 +249,6 @@ function setIsActive(isActive, postId, selector) {
             is_active: 1 * isActive
         },
         'success': function(response){
-            console.log(response.is_active);
             if (response.is_active) {
                 $(selector).removeClass('toggle-1').addClass('toggle-0');
             } else {
