@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="postModal" tabindex="-1" role="dialog">
+<div class="modal" id="postModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -18,10 +18,19 @@
 
 <script>
     function showModal(postId) {
-        $.get('/post/'+postId+'?from=index', function(html){
+        history.pushState({'page_id': postId}, '', '/post/'+postId+'/');
+        $.get('/post/'+postId+'/?from=index', function(html){
             $('#modalPostContent').html(html);
         });
         $('#postModal').modal('show');
         return false;
     }
+    $(function () {
+        $('#postModal').on('hide.bs.modal', function (e) {
+            history.pushState({'page_id': 0}, '', '/');
+        });
+        {% if item %}
+        showModal({{ item.id }});
+        {% endif %}
+    });
 </script>

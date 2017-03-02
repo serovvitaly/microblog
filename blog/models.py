@@ -70,7 +70,8 @@ class Post(models.Model):
         content_sections = self.content.split('<!--ANNOTATION_SPLITTER-->')
         if len(content_sections) == 1:
             return ''
-        annotation = markdown.markdown(content_sections[0])
+        annotation = content_sections[0]
+        #annotation = markdown.markdown(annotation)
         return annotation.strip()
 
     def len_without_sp(self):

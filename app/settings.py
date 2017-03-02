@@ -32,6 +32,7 @@ ALLOWED_HOSTS = env.ALLOWED_HOSTS
 # Application definition
 
 INSTALLED_APPS = [
+    'debug_panel',
     'rest_framework',
     'ckeditor',
     'django_comments',
@@ -44,9 +45,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_panel.middleware.DebugPanelMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -152,4 +156,20 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    },
+
+    # this cache backend will be used by django-debug-panel
+    'debug-panel': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/debug-panel-cache',
+        'OPTIONS': {
+            'MAX_ENTRIES': 200
+        }
+    }
 }
