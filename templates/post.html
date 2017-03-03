@@ -21,8 +21,10 @@
 {% endwith %}
 {% endif %}
 <div class="post-content">{{ post_content|safe }}</div>
+<hr>
+{% include 'widget/social-net-line.html' %}
+<hr>
 {% if item.source_base_url %}
-    <hr>
 <p>
     <a href="{{ item.source_url }}" class="btn btn-sm btn-default" target="_blank">
         <strong>Источник:</strong> {{ item.source_base_url }}
@@ -31,23 +33,4 @@
 {% endif %}
 {% include 'widget/related-posts.html' %}
 {% include 'widget/interesting-posts.html' %}
-{% endblock %}
-
-{% block right-side %}
-{% for post in posts %}
-    {% if post.id != item.id %}
-    <div class="media">
-        <div class="pull-left">
-            {% if post.image %}
-            <a href="{{ post.url }}?from=post_{{ item.id }}">
-                <img alt="{{ post.title }}" class="media-object" src="{{ post.image }}" style="width: 100px; border-radius: 6px;">
-            </a>
-            {% endif %}
-        </div>
-        <div class="media-body">
-            <h4 class="media-heading title"><a href="{{ post.url }}?from=post_{{ item.id }}">{{ post.title }}</a></h4>
-        </div>
-    </div>
-    {% endif %}
-{% endfor %}
 {% endblock %}
