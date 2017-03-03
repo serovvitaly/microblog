@@ -83,6 +83,10 @@ class Post(models.Model):
 
             def handle_starttag(self, tag, attrs):
                 attrs = {key: value for key, value in attrs}
+                if tag == 'p':
+                    self.fed.append('<p>')
+                if tag == 'strong':
+                    self.fed.append('<strong>')
                 if tag == 'img':
                     if self.img_counter >= 1:
                         return
@@ -91,6 +95,12 @@ class Post(models.Model):
                             return
                     self.fed.append('<img src="'+attrs['src']+'" alt="">')
                     self.img_counter += 1
+
+            def handle_endtag(self, tag):
+                if tag == 'p':
+                    self.fed.append('</p>')
+                if tag == 'strong':
+                    self.fed.append('</strong>')
 
             def handle_data(self, d):
                 self.fed.append(d)
