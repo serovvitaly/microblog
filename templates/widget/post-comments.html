@@ -1,22 +1,17 @@
 
 
 <div class="row">
-    <div class="col-lg-5"><hr></div>
-    <div class="col-lg-2"><h4 class="title text-center">КОММЕНТАРИИ</h4></div>
-    <div class="col-lg-5"><hr></div>
+    <div class="col-lg-4"><hr></div>
+    <div class="col-lg-4"><h4 class="title text-center">КОММЕНТАРИИ</h4></div>
+    <div class="col-lg-4"><hr></div>
 </div>
 
-<!-- Put this script tag to the <head> of your page -->
-<script type="text/javascript" src="//vk.com/js/api/openapi.js?136"></script>
-
-<script type="text/javascript">
-  VK.init({apiId: 5774235, onlyWidgets: true});
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://dev-zalipay-com.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
 </script>
-
-<!-- Put this div tag to the place, where the Comments block will be -->
-<div id="vk_comments"></div>
-<script type="text/javascript">
-VK.Widgets.Comments("vk_comments", {limit: 10, attach: "*"});
-</script>
-<p></p>
-<p></p>
