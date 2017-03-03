@@ -85,6 +85,8 @@ class Post(models.Model):
                 attrs = {key: value for key, value in attrs}
                 if tag == 'p':
                     self.fed.append('<p>')
+                if tag == 'h3':
+                    self.fed.append('<strong>')
                 if tag == 'strong':
                     self.fed.append('<strong>')
                 if tag == 'img':
@@ -99,6 +101,8 @@ class Post(models.Model):
             def handle_endtag(self, tag):
                 if tag == 'p':
                     self.fed.append('</p>')
+                if tag == 'h3':
+                    self.fed.append('</strong>')
                 if tag == 'strong':
                     self.fed.append('</strong>')
 
